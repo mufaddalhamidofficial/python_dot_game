@@ -222,7 +222,7 @@ def checkWinner():
     global gameOver,   playerInitial, gameActive, buttonPos
     print(playerPoints)
     totalBoxes = (row - 1) * (col - 1)
-    if sum(playerPoints) >= totalBoxes:
+    if sum(playerPoints) >= 2:
         clearScreen()
         gameOver = True
         gameActive = False
@@ -294,6 +294,9 @@ def checkBoxMade():
         n_p_c3.append(p)
     p_c3 = n_p_c3
     del n_p_c3
+    if len(p_c3) <= 0:
+        changePlayer()
+
     for c3 in p_c3:
         p_c4 = [c3 + 1, c3 - 1, c3 + col,
                 c3 - col]
@@ -320,6 +323,9 @@ def checkBoxMade():
         # print(f'c2: {c2}')
         # print(f'c3: {c3}')
         print(f'p_c4: {p_c4}')
+        if len(p_c4) <= 0:
+            changePlayer()
+
         for c4 in p_c4:
             box = [c1, c2, c3, c4]
             box.sort()
@@ -385,7 +391,6 @@ def onGamePress(x, y):
                         tim.dot(dot_width, 'black')
                         addToLineMade(dot.index, current_highlighted.index)
                         checkBoxMade()
-                        changePlayer()
                         writeScores()
                 if not gameOver:
                     tim.setpos(current_highlighted.x, current_highlighted.y)
