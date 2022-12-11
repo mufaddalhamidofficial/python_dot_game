@@ -310,7 +310,7 @@ def checkBoxMade():
                 continue
             if p < 0 or p > number_of_dots - 1:
                 continue
-            if abs(p - c1) != 10 and abs(p - c1) != 1:
+            if abs(p - c1) != col and abs(p - c1) != 1:
                 continue
             if not checkLineContains(p, c3):
                 continue
