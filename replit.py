@@ -24,8 +24,8 @@ gameOver = False
 gameActive = False
 
 
-line_made: list[tuple[int]] = []
-box_claimed: list[list[int]] = []
+line_made = []
+box_claimed = []
 
 numberOfPlayers = 2
 colormode(255)
@@ -43,11 +43,11 @@ tim = Turtle()
 tim.speed(500)
 tim.penup()
 tim.hideturtle()
-all_dots: list[Dot] = []
+all_dots = []
 screen = Screen()
-screenTk = screen.getcanvas().winfo_toplevel()
+# screenTk = screen.getcanvas().winfo_toplevel()
 # screenTk.attributes("-fullscreen", True)
-screenTk.state('zoomed')
+# screenTk.state('zoomed')
 screen.tracer(0)
 
 
@@ -282,7 +282,7 @@ def checkBoxMade():
     c2 = current[1]
     p_c3 = [c2 + 1, c2 - 1, c2 + col,
             c2 - col]
-    n_p_c3: list[int] = []
+    n_p_c3 = []
     if (c2 % col) == 0:
         p_c3.remove(c2 - 1)
     if ((c2 + 1) % col) == 0:
@@ -301,7 +301,7 @@ def checkBoxMade():
     for c3 in p_c3:
         p_c4 = [c3 + 1, c3 - 1, c3 + col,
                 c3 - col]
-        n_p_c4: list[int] = []
+        n_p_c4 = []
         if (c3 % col) == 0:
             p_c4.remove(c3 - 1)
         if ((c3 + 1) % col) == 0:

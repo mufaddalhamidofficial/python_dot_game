@@ -1,4 +1,4 @@
-from turtle import Turtle, Screen, colormode, done, Vec2D
+from turtle import Turtle, Screen, done
 from time import sleep
 import math
 # from dot import Dot
@@ -24,11 +24,10 @@ gameOver = False
 gameActive = False
 
 
-line_made: list[tuple[int]] = []
-box_claimed: list[list[int]] = []
+line_made = []
+box_claimed = []
 
 numberOfPlayers = 2
-colormode(255)
 playerColors = [(255, 0, 0), (0, 255, 0), (0, 0, 255),
                 (255, 255, 0), (255, 0, 255), (0, 255, 255)]
 playerInitial = ["R", "G", "B", "Y", "P", "C"]
@@ -38,17 +37,21 @@ playerPoints = [0] * numberOfPlayers
 th = dot_spacing * row
 tw = dot_spacing * col
 
-
 tim = Turtle()
 tim.speed(500)
 tim.penup()
 tim.hideturtle()
-all_dots: list[Dot] = []
+all_dots = []
 screen = Screen()
-screenTk = screen.getcanvas().winfo_toplevel()
+# screenTk = screen.getcanvas().winfo_toplevel()
 # screenTk.attributes("-fullscreen", True)
-screenTk.state('zoomed')
+# screenTk.state('zoomed')
 screen.tracer(0)
+
+scorePos = None
+buttonPos = None
+number_of_dots = None
+titlePos = None
 
 
 def clearScreen():
@@ -88,7 +91,8 @@ def writeScores():
     tim.setpos(0, scorePos)
     scoreStr = ""
     for i in range(len(playerPoints)):
-        scoreStr += f"{playerInitial[i]}: {playerPoints[i]}{' ' if gameOver or currentPlayer != i else '*'}    "
+        scoreStr += str(playerInitial[i]) + ": "+str(playerPoints[i]) + (
+            ' ' if gameOver or currentPlayer != i else '*') + "    "
     tim.write(scoreStr[:-4], align="center", font=["Arial", 20, "bold"])
 
 
@@ -103,8 +107,8 @@ def playGame():
 
     th = dot_spacing * row
     tw = dot_spacing * col
-    print(th)
-    print(tw)
+    # print(th)
+    # print(tw)
     tim.setheading(math.degrees(math.radians(180)+math.atan(th / tw)))
 
     tim.forward(math.sqrt(((th) ** 2) + ((tw) ** 2)) / 2)
@@ -142,12 +146,12 @@ def playGame():
     titlePos = tim.pos()
     tim.write("Dots and Boxes", align="center", font=["Arial", 50, "bold"])
 
-    print(len(all_dots))
+    # print(len(all_dots))
 
 
 def changePlayer():
     global currentPlayer
-    print("Changing Player")
+    # print("Changing Player")
     currentPlayer += 1
     if currentPlayer >= numberOfPlayers:
         currentPlayer = 0
@@ -222,7 +226,7 @@ def colorBox(x, y):
 
 def checkWinner():
     global gameOver,   playerInitial, gameActive, buttonPos
-    print(playerPoints)
+    # print(playerPoints)
     totalBoxes = (row - 1) * (col - 1)
     if sum(playerPoints) >= totalBoxes:
         clearScreen()
@@ -243,7 +247,7 @@ def checkWinner():
         tim.setpos(0, 0)
         tim.setheading(270)
         tim.forward((60 * 1.4) / 2)
-        tim.write(f"Congrats {winnerName[2:]} 🎉", align="center", font=[
+        tim.write("Congrats " + str(winnerName[2:])+" ", align="center", font=[
                   "Arial", 60, "bold"])
         tim.color("black")
         tim.setpos(-200 / 2, -150)
@@ -274,15 +278,15 @@ def checkBoxMade():
     current = line_made[-1]
     horiz = current[1] - current[0] > 1
     # print(horiz)
-    print("")
-    print("")
-    print("")
+    # print("")
+    # print("")
+    # print("")
     shouldChange = True
     c1 = current[0]
     c2 = current[1]
     p_c3 = [c2 + 1, c2 - 1, c2 + col,
             c2 - col]
-    n_p_c3: list[int] = []
+    n_p_c3 = []
     if (c2 % col) == 0:
         p_c3.remove(c2 - 1)
     if ((c2 + 1) % col) == 0:
@@ -301,7 +305,7 @@ def checkBoxMade():
     for c3 in p_c3:
         p_c4 = [c3 + 1, c3 - 1, c3 + col,
                 c3 - col]
-        n_p_c4: list[int] = []
+        n_p_c4 = []
         if (c3 % col) == 0:
             p_c4.remove(c3 - 1)
         if ((c3 + 1) % col) == 0:
@@ -320,10 +324,6 @@ def checkBoxMade():
             n_p_c4.append(p)
         p_c4 = n_p_c4
         del n_p_c4
-        # print(f'c1: {c1}')
-        # print(f'c2: {c2}')
-        # print(f'c3: {c3}')
-        print(f'p_c4: {p_c4}')
         if len(p_c4) > 0:
             shouldChange = False
 
@@ -357,7 +357,6 @@ i = 0
 
 def onGamePress(x, y):
     global current_highlighted, line_made, currentPlayer, playerColors, iswriting, i
-    print(f"I am hereee {i}")
     i += 1
     if iswriting or gameOver:
         return
@@ -411,7 +410,6 @@ def onGamePress(x, y):
 
 def onHomePress(x, y, force=False):
     global buttonPos,  numberOfPlayers, playerPoints, gameOver, gameActive, current_highlighted, line_made, box_claimed, currentPlayer, all_dots
-    print(f"hello {x} {y}")
     if buttonPos[0] < x and buttonPos[1] < y and buttonPos[0] + 200 > x and buttonPos[1] + 50 > y:
         d = screen.textinput(
             "Enter", "Number of players must be not be more than 6" if force else "Please enter number of players (Max 6)")
@@ -424,7 +422,6 @@ def onHomePress(x, y, force=False):
 
         playerPoints = [0] * numberOfPlayers
         # except e:
-        colormode(255)
         clearScreen()
         current_highlighted = None
         line_made = []
@@ -483,10 +480,10 @@ def displayHomePage():
 def onPress(x, y):
     global gameOver, gameActive
     if not gameOver and gameActive:
-        print("here1")
+        # print("here1")
         onGamePress(x, y)
     elif not gameActive:
-        print("here2")
+        # print("here2")
         onHomePress(x, y)
     else:
         print("here3")
