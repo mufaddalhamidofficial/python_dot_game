@@ -12,6 +12,7 @@ class Dot:
         self.index = index
 
 
+font = "Calibri"
 dot_width = 15
 line_width = 7.5
 dot_spacing = 50
@@ -40,7 +41,7 @@ tw = dot_spacing * col
 
 
 tim = Turtle()
-tim.speed(500)
+tim.speed(1)
 tim.penup()
 tim.hideturtle()
 all_dots: list[Dot] = []
@@ -89,7 +90,7 @@ def writeScores():
     scoreStr = ""
     for i in range(len(playerPoints)):
         scoreStr += f"{playerInitial[i]}: {playerPoints[i]}{' ' if gameOver or currentPlayer != i else '*'}    "
-    tim.write(scoreStr[:-4], align="center", font=["Arial", 20, "bold"])
+    tim.write(scoreStr[:-4], align="center", font=[font, 20, "bold"])
 
 
 def playGame():
@@ -140,7 +141,8 @@ def playGame():
     tim.setheading(90)
     tim.forward(dot_spacing)
     titlePos = tim.pos()
-    tim.write("Dots and Boxes", align="center", font=["Arial", 50, "bold"])
+    tim.write("Dots and Boxes", align="center", font=[font, 50, "bold"])
+    tim.color('black')
 
     print(len(all_dots))
 
@@ -193,8 +195,10 @@ def colorBox(x, y):
     b = pc[2]
     tim.color(255 if r == 255 else 150, 255 if g ==
               255 else 150, 255 if b == 255 else 150)
+    # screen.tracer(1)
     tim.begin_fill()
-    tim.pendown()
+    # tim.pendown()
+    
     tim.forward(dot_spacing - dot_width - 1)
     tim.setheading(90)
     tim.forward(dot_spacing - dot_width - 1)
@@ -203,8 +207,9 @@ def colorBox(x, y):
     tim.setheading(270)
     tim.forward(dot_spacing - dot_width - 1)
 
-    tim.penup()
+    # tim.penup()
     tim.end_fill()
+    # screen.tracer(0)
 
     tim.setpos(x, y)
     tim.setheading(90)
@@ -217,7 +222,7 @@ def colorBox(x, y):
     tim.color(200 if r == 255 else r, 200 if g ==
               255 else g, 200 if b == 255 else b)
     tim.write(playerInitial[currentPlayer],
-              align="center", font=["Arial", 16, "bold"])
+              align="center", font=[font, 16, "bold"])
 
 
 def checkWinner():
@@ -237,14 +242,14 @@ def checkWinner():
 
         tim.setpos(titlePos)
         tim.color('black')
-        tim.write("Dots and Boxes", align="center", font=["Arial", 50, "bold"])
+        tim.write("Dots and Boxes", align="center", font=[font, 50, "bold"])
         # writeScores()
 
         tim.setpos(0, 0)
         tim.setheading(270)
         tim.forward((60 * 1.4) / 2)
         tim.write(f"Congrats {winnerName[2:]} 🎉", align="center", font=[
-                  "Arial", 60, "bold"])
+                  font, 60, "bold"])
         tim.color("black")
         tim.setpos(-200 / 2, -150)
         tim.width(5)
@@ -266,7 +271,7 @@ def checkWinner():
         tim.setheading(270)
         tim.forward(25 + (20 * 1.65)/2)
         tim.color("white")
-        tim.write("Restart Game", align='center', font=["Arial", 20, "bold"])
+        tim.write("Restart Game", align='center', font=[font, 20, "bold"])
 
 
 def checkBoxMade():
@@ -367,6 +372,7 @@ def onGamePress(x, y):
 
             if current_highlighted is not None:
                 iswriting = True
+                click = True
                 if (current_highlighted.x - dot_spacing - (current_highlighted.size * 3 / 2)) < x \
                         and (current_highlighted.x + dot_spacing + (current_highlighted.size * 3 / 2)) > x \
                         and (current_highlighted.y - dot_spacing - (current_highlighted.size * 3 / 2)) < y \
@@ -389,18 +395,24 @@ def onGamePress(x, y):
                         tim.setheading(angle)
                         tim.width(line_width)
                         tim.pendown()
+                        screen.tracer(1)
                         tim.forward(dot_spacing)
+                        screen.tracer(0)
                         tim.penup()
                         tim.dot(dot_width, 'black')
                         addToLineMade(dot.index, current_highlighted.index)
                         checkBoxMade()
                         writeScores()
+                else:
+                    click = True
                 if not gameOver:
                     tim.setpos(current_highlighted.x, current_highlighted.y)
                     tim.dot(dot_width, 'black')
 
                 iswriting = False
                 current_highlighted = None
+                if click:
+                    onGamePress(x, y)
             else:
                 iswriting = True
                 current_highlighted = dot
@@ -409,17 +421,24 @@ def onGamePress(x, y):
                 iswriting = False
 
 
-def onHomePress(x, y, force=False):
+def onHomePress(x, y, force=False, text=None):
     global buttonPos,  numberOfPlayers, playerPoints, gameOver, gameActive, current_highlighted, line_made, box_claimed, currentPlayer, all_dots
     print(f"hello {x} {y}")
     if buttonPos[0] < x and buttonPos[1] < y and buttonPos[0] + 200 > x and buttonPos[1] + 50 > y:
         d = screen.textinput(
-            "Enter", "Number of players must be not be more than 6" if force else "Please enter number of players (Max 6)")
+            "Enter", text if force else "Please enter number of players (Max 6)")
         # try:
-        numberOfPlayers = int(d)
-        if numberOfPlayers > 6:
+        if d is None:
+            return
+        if not d.isdigit():
             if not force:
-                onHomePress(x, y, True)
+                onHomePress(x, y, True, text ="Number of players should be a number")
+            return
+            
+        numberOfPlayers = int(d)
+        if numberOfPlayers > 6 or numberOfPlayers < 2:
+            if not force:
+                onHomePress(x, y, True, "Number of players should be between 2-6")
             return
 
         playerPoints = [0] * numberOfPlayers
@@ -451,10 +470,10 @@ def displayHomePage():
     # screen.setup(width=1.0, height=1.0, startx=None, starty=None)
     tim.setpos(0, 100)
     tim.color('black')
-    tim.write("Dots and Boxes", align="center", font=["Arial", 50, "bold"])
+    tim.write("Dots and Boxes", align="center", font=[font, 50, "bold"])
     tim.setpos(0, 0)
     # tim.write("Enter Player Count: ", move=True, align="center",
-    #           font=["Arial", 20, "bold"])
+    #           font=[font, 20, "bold"])
     # tim.showturtle()
 
     tim.setpos(-200 / 2, -50)
@@ -477,7 +496,36 @@ def displayHomePage():
     tim.setheading(270)
     tim.forward(25 + (20 * 1.65)/2)
     tim.color("white")
-    tim.write("Start Game", align='center', font=["Arial", 20, "bold"])
+    tim.write("Start Game", align='center', font=[font, 20, "bold"])
+    tim.penup()
+    tim.setx(30)
+    tim.setheading(270)
+    tim.forward(100)
+    tim.color('black')
+    submittedpos = tim.pos()
+    tim.write("Submitted By", align='left', font=[font, 10, "bold"])
+    tim.forward(12*1.5)
+    """ Arial """
+    tim.write("Lokesh Parmar - 0832AD211025", align='left', font=[font, 10, "bold"])
+    tim.forward(12*1.5)
+    """ Comic Sans MS """
+    tim.write("Mufaddal Hamid - 0832AD211034", align='left', font=[font, 10, "bold"])
+    tim.forward(12*1.5)
+    """ Times New Roman """
+    tim.write("Radhika Yadav - 0832AD211043", align='left', font=[font, 10, "bold"])
+    tim.forward(12*1.5)
+    """ Calibri """
+    tim.write("Tusha Deshpande - 0832AD211055", align='left', font=[font, 10, "bold"])
+    tim.forward(12*1.5)
+    """ Karla """
+    tim.write("Yashraj Yadav - 0832AD211059", align='left', font=[font, 10, "bold"])
+    tim.setpos(submittedpos)
+    tim.setx(-30)
+    tim.write("Submitted To", align='right', font=[font, 10, "bold"])
+    tim.forward(12*1.5)
+    tim.write("Mr. Deepesh Shrivas", align='right', font=[font, 10, "bold"])
+    tim.forward(12*1.5)
+    tim.write("Ass. Professor", align='right', font=[font, 10, "bold"])
 
 
 def onPress(x, y):
@@ -493,9 +541,7 @@ def onPress(x, y):
 
 
 displayHomePage()
-# playGame()
 
 screen.onclick(onPress)
-# screen.onclick(onGamePress)
 
 done()
